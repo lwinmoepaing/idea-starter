@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "tldraw": {
+      "type": "stdio",
+      "command": "node",
+      "args": [".mcp-servers/tldraw-render-mcp/dist/index.js"]
+    }
+  }
+}

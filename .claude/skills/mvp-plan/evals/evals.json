@@ -1,0 +1,55 @@
+{
+  "skill_name": "mvp-plan",
+  "evals": [
+    {
+      "id": "consumer-recipe-app",
+      "prompt": "ok i'm ready to start building the FridgeChef MVP. idea id is 0001, all the workflow files are in workflow/ideas/, workflow/approach/, workflow/marketing/. the mvp/ folder is empty — nothing scaffolded yet. can you plan out the build? i want to know which parts can be built in parallel and which have to wait. demo target is the 'snap fridge → recipe in 5 seconds' moment for influencer videos.",
+      "expected_output": "plans/0001-plan-root.md plus several plans/todo/0001-NN-<slug>.md phase files. Root must list phases with blocked-by and parallel-safe columns. First phase should be design-system + scaffold (mvp/ is empty). Stack defaulted to React + RR + Zustand. A 'snap fridge' demo moment should be planned with a fake (static image, not real vision API).",
+      "files": [],
+      "assertions": [
+        "root plan file exists at plans/0001-plan-root.md",
+        "root plan lists phases in a table or numbered structure",
+        "root plan declares per-phase dependencies (blocked by / depends on)",
+        "root plan calls out which phases are parallel-safe",
+        "root plan or some phase file mentions React, React Router, and Zustand as the stack",
+        "plan tree contains at least one phase covering design system or scaffold (mvp/ is empty)",
+        "plan tree contains at least one phase covering the 'snap fridge' capture moment",
+        "the snap/capture phase explicitly uses a fake or stub for vision recognition (no real model integration in MVP)",
+        "phase files live under plans/todo/ (per the skill's layout)",
+        "phase files use the {id}-{NN}-{slug}.md naming pattern"
+      ]
+    },
+    {
+      "id": "b2b-standup-tool",
+      "prompt": "plan the build for StandupDigest, id is 2 (or 0002). i already scaffolded the mvp — there's a package.json, App.tsx with React Router set up, and a Zustand store. don't redo the scaffold, just plan the feature work. the demo flow is in the marketing file. show HN launch is the target.",
+      "expected_output": "plans/0002-plan-root.md plus phase files. No 'design-system + scaffold' phase (skill should detect mvp/package.json and skip). Phases cover digest dashboard (theme-grouped bullets), bullet editing, 'send to manager' Slack-DM mock, and history view.",
+      "files": [],
+      "assertions": [
+        "root plan file exists at plans/0002-plan-root.md",
+        "plan tree does NOT include a 'design system + scaffold' phase (mvp/ is already scaffolded)",
+        "plan tree contains a phase for the digest dashboard / theme-grouped bullets",
+        "plan tree contains a phase or task covering bullet editing",
+        "plan tree contains a phase covering the 'send to manager' interaction (faked, not real Slack API)",
+        "plan tree contains a phase covering the digest history view",
+        "root plan declares per-phase dependencies and parallel-safe groupings",
+        "plan respects the existing scaffold (does not propose changing the framework, router, or state lib)"
+      ]
+    },
+    {
+      "id": "thin-context-pet-care",
+      "prompt": "i want to plan an mvp for idea 0003 (pet care reminders for multi-pet households). heads up: i only ran validate-idea, i haven't done the pain-hunt or the marketing plan yet — only the workflow/ideas/ file exists. can you still plan with what's there? the demo is for showing my partner and 2 friends with multi-pet households this weekend, not for investors.",
+      "expected_output": "plans/0003-plan-root.md plus phase files. Plan explicitly flags missing approach/ and marketing/ context. Includes design-system + scaffold (mvp/ empty), per-pet card UI, 'tap when done' interaction, multi-user sync faked via Zustand. Scope appropriate for an informal weekend demo (not over-engineered).",
+      "files": [],
+      "assertions": [
+        "root plan file exists at plans/0003-plan-root.md",
+        "plan explicitly notes that workflow/approach/ and workflow/marketing/ files are missing",
+        "plan tree includes a design-system + scaffold phase (mvp/ is empty)",
+        "plan tree includes a phase for per-pet card UI",
+        "plan tree includes a phase for the 'tap when done' interaction",
+        "plan tree includes a phase covering multi-user / household-sharing fake (Zustand-based, not real backend)",
+        "root plan has an 'Assumptions made' section listing the defaults the planner chose for unanswered questions",
+        "plan scope is appropriate for an informal demo (not over-engineered with auth flows, real backend, etc.)"
+      ]
+    }
+  ]
+}

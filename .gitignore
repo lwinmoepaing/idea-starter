@@ -11,3 +11,6 @@
 
 # Bootstrapped MCP servers (built by scripts/setup-mcp.sh)
 .mcp-servers/
+
+# Playwright MCP
+.playwright-mcp/

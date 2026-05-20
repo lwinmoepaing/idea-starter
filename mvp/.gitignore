@@ -1,0 +1,5 @@
+# Scaffold placeholder: track only this folder's README; ignore the generated
+# MVP (source, node_modules, dist, build output — everything is regenerated).
+*
+!.gitignore
+!README.md

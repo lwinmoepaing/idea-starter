@@ -1,6 +1,6 @@
 # idea-starter
 
-Idea-to-MVP scaffolding: drill a problem, hunt unsolicited demand evidence, sketch on a tldraw canvas, then build the MVP. Each stage has its own folder.
+Idea-to-MVP scaffolding: drill a problem, hunt unsolicited demand evidence, sketch on a tldraw canvas, build the MVP, then walk its demo in a real browser. Each stage has its own folder.
 
 ## Mental model — one product per repo
 
@@ -28,6 +28,7 @@ When `mvp-plan` plans `#0002+`, it reads `plans/done/*.md` across all IDs so new
 | `docs/`                 | Specs, Lean Canvas PNGs (`business-canvas`), pitch summaries (`pitch-summary`)                                     |
 | `plans/`                | Build plans — `{id}-plan-root.md` + phases in `todo/` → `done/` when shipped (`mvp-plan`)                          |
 | `mvp/`                  | Prototype code (Vite + React + RR + Zustand), built phase-by-phase                                                 |
+| `reports/`              | Browser-walkthrough reports + screenshots — `playwalkthrough` (`#{id}-<slug>-walkthrough.md`)                      |
 | `.claude/skills/`       | Project-local Claude Code skills (table below)                                                                     |
 | `.claude/agents/`       | Sub-agents invoked by skills via the Agent tool (table below)                                                      |
 
@@ -70,6 +71,7 @@ Opens a full-viewport tldraw canvas at the URL Vite prints.
 | `business-canvas`  | Reads the three workflow files for an ID, renders a Lean Canvas PNG via the `tldraw` MCP → `docs/#NNNN-<slug>-canvas.png`                            |
 | `mvp-plan`         | Reads the workflow + checks `mvp/package.json`, writes `plans/{id}-plan-root.md` + per-phase files in `todo/`. Orchestrates 4 sub-agents             |
 | `mvp-execute`      | Walks the plan in DAG order via `phase-executor`, `mv`s shipped phases to `done/`, pauses between groups for dev-server checks. When the last phase ships, spawns `pitch-summary` to write `docs/#{id}-<slug>-pitch.md` |
+| `playwalkthrough`  | Drives the built MVP through its root-plan `Demo flow` in a real browser (`playwright` MCP), turns the deferred `[?]` runtime checks into pass/fail with screenshots → `reports/#{id}-<slug>-walkthrough.md`. Run after `mvp-execute`, before pitching |
 | `frontend-design`  | Builds distinctive, production-grade UI for `tools/drawing/` and `mvp/` — bold aesthetic, not generic AI defaults                                    |
 | `skill-creator`    | Author / iterate skills                                                                                                                              |
 
@@ -92,9 +94,10 @@ Workers that skills delegate to via the Agent tool (`subagent_type: <name>`). Ke
 
 | Server   | Purpose                                          | Source                                                                                  |
 | -------- | ------------------------------------------------ | --------------------------------------------------------------------------------------- |
-| `tldraw` | Headless tldraw renderer (PNG/SVG) for agent use | [`bassimeledath/tldraw-render-mcp`](https://github.com/bassimeledath/tldraw-render-mcp) |
+| `tldraw`     | Headless tldraw renderer (PNG/SVG) for agent use      | [`bassimeledath/tldraw-render-mcp`](https://github.com/bassimeledath/tldraw-render-mcp) |
+| `playwright` | Headless Chromium to walk the MVP demo (`playwalkthrough`) | [`microsoft/playwright-mcp`](https://github.com/microsoft/playwright-mcp) — `@playwright/mcp`, via `npx` |
 
-Project-scope — Claude Code prompts to enable on first open. Built locally by `tools/scripts/setup-mcp.sh` into `.mcp-servers/` (gitignored).
+Project-scope — Claude Code prompts to enable on first open. `tldraw` is built locally by `tools/scripts/setup-mcp.sh` into `.mcp-servers/` (gitignored); `playwright` needs no build — `npx` fetches `@playwright/mcp` on first use (first launch may download Chromium via `npx playwright install chromium`). MCP servers attach only at Claude Code startup, so **restart after editing `.mcp.json`**.
 
 ## Typical flow
 
@@ -106,3 +109,4 @@ Project-scope — Claude Code prompts to enable on first open. Built locally by 
 6. `business-canvas` — renders the Lean Canvas PNG from the workflow trio.
 7. `mvp-plan` — decomposes into phases, maps dependencies, writes `plans/{id}-plan-root.md` + per-phase files in `todo/`.
 8. `mvp-execute` — walks the DAG: spawns `phase-executor` per runnable phase, fans out parallel-safe groups, `mv`s shipped files to `done/`, pauses for dev-server checks. When the last phase ships, `pitch-summary` drops `docs/#{id}-<slug>-pitch.md` — slide-ready source material. All in `done/` = MVP demo-ready.
+9. `playwalkthrough` — drives the finished MVP through the root plan's `Demo flow` in a real browser via the `playwright` MCP, turning the deferred `[?]` runtime checks into pass/fail with screenshots → `reports/#{id}-<slug>-walkthrough.md`. The demo is the test — walk it before pitching.

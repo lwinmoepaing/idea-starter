@@ -4,6 +4,11 @@
       "type": "stdio",
       "command": "node",
       "args": [".mcp-servers/tldraw-render-mcp/dist/index.js"]
+    },
+    "playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"]
     }
   }
 }

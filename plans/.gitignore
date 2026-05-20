@@ -1,0 +1,6 @@
+# Scaffold placeholder: track only README.md files (here + in todo/ and done/);
+# ignore the generated root plan and phase files.
+*
+!*/
+!.gitignore
+!README.md

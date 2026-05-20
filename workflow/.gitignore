@@ -1,0 +1,6 @@
+# Scaffold placeholder: track only README.md files (here + in ideas/, approach/,
+# marketing/); ignore the per-idea evidence files.
+*
+!*/
+!.gitignore
+!README.md

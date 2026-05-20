@@ -1,0 +1,5 @@
+# Scaffold placeholder: track only this folder's README; ignore generated docs
+# (pitch summaries, Lean Canvas PNGs/JSON, etc.).
+*
+!.gitignore
+!README.md

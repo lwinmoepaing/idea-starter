@@ -1,0 +1,5 @@
+# Scaffold placeholder: track only this folder's README; ignore generated
+# walkthrough reports + screenshots.
+*
+!.gitignore
+!README.md

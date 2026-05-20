@@ -73,11 +73,74 @@ If after asking the user *still* has no answer for a cell — they don't know th
 
 ## Step 4 — Learn the tldraw shape format
 
-Call the `tldraw` MCP server's `tldraw_read_me` tool once. It returns the shape format reference (allowed shape types, color enums, the auto-conversion rules for IDs and rich text). Read it before building shapes — the format has subtleties (e.g., `text` props auto-convert to `richText`, plain string IDs work fine, arrow bindings have a shorthand).
+Call the `tldraw` MCP server's `tldraw_read_me` tool once. It returns the shape format reference (allowed shape types, the 13 named colors, fill modes, auto-conversion rules). Read it before building shapes.
 
-## Step 5 — Lay out the canvas
+Two constraints shape everything below:
 
-The Lean Canvas grid is 5 columns wide on top with two of the columns split horizontally, and 2 cells across the bottom. Use these coordinates (units are tldraw px; canvas ends up ~1500×900):
+- **No hex colors.** tldraw accepts only 13 named colors (`orange`, `yellow`, `light-green`, `light-blue`, `red`, `grey`, …) and four fills (`none|semi|solid|pattern`). So the canvas's "design system" is a fixed *mapping* onto those names — you can't drop in this product's `#FAF3E7` / `#C8791A` tokens directly. The mapping below is chosen to read warm and light anyway.
+- **Standalone `text` shapes are unreliable in headless export.** Their width is auto-measured before the web font loads, the measurement comes back ~0, and the text collapses into a tiny clipped box — so you silently lose your title or labels. Keep *every* piece of text inside a `geo` shape, which has a fixed `w` so text always wraps. The build script (Step 5) already does this; if you ever hand-edit shapes, hold that line.
+
+## Step 5 — Build the canvas (design system + build script)
+
+A Lean Canvas that looks like a bare wireframe gets glanced at and closed. A little design — warm color, a clear header/body split, a flagged weak cell — makes the user actually read it and *see the gaps*, which is the entire job of this artifact. So render it through a small design system rather than freehand boxes.
+
+**Don't hand-build the ~30 shapes.** Use the bundled script — it owns the coordinates, the color system, the header/body card split, and the all-text-inside-geo rule, so you spend your attention on the *content* of each cell (Step 3) instead of pixel math. You only feed it the bullets.
+
+```
+python .claude/skills/business-canvas/scripts/build_canvas.py <input.json> <out.tldr.json> [--theme color|mono]
+```
+
+`input.json` carries only what you synthesized — headers and layout are fixed:
+
+```json
+{
+  "id": "0001",
+  "name": "Myanmar Serial Reader",
+  "cells": {
+    "problem":   {"body": "• one\n• two\n• three"},
+    "solution":  {"body": "• ..."},
+    "metrics":   {"body": "• ..."},
+    "uvp":       {"body": "..."},
+    "advantage": {"body": "..."},
+    "channels":  {"body": "..."},
+    "segments":  {"body": "..."},
+    "cost":      {"body": "..."},
+    "revenue":   {"body": "..."},
+    "adopters":  {"body": "..."}
+  }
+}
+```
+
+A cell that is missing, blank, or marked `"weak": true` renders **red** (`⚠ unknown — open question`). Lean into that — an honest red cell is the user's homework and the most valuable thing on the page. Don't fluff a guess just to avoid the red.
+
+The script writes the editable shapes JSON to `<out.tldr.json>` *and* prints the same JSON compactly to stdout — capture stdout and pass it straight to the render call in Step 6.
+
+### The design system ("warm-light Lantern Canvas")
+
+This product reads in a warm light "lantern-dawn" register (paper + amber + literary serif), so the canvas matches: **serif** title and headers, **sans** body, soft fills, an amber accent. The script offers two themes:
+
+- **`color` (default)** — region color carries meaning, so the business model is legible at a glance:
+
+  | Region | Cells | Color |
+  | ------ | ----- | ----- |
+  | How it works | Problem, Solution, Key Metrics, Channels | `light-blue` |
+  | The heart | Unique Value Proposition | `orange` (amber) |
+  | Who it's for | Customer Segments, Unfair Advantage, Early Adopters | `yellow` |
+  | The money | Cost Structure, Revenue Streams | `light-green` |
+  | Weak / empty (overrides region) | any cell | `red` header + `light-red` body |
+
+- **`mono`** — every section in a single amber accent on white cards. Calmer, the most literal match to lantern-dawn. Less information (no region meaning); only weak cells still go red.
+
+Render `color` by default. After it lands, tell the user the calmer `mono` version exists and re-render with `--theme mono` if they prefer it — this is the deliberate "user picks at render" step.
+
+### What the design system draws (so you can sanity-check or override)
+
+- **Cards, not cells.** Each of the 10 boxes is a `solid`-filled **header strip** (serif, the cell name in caps) stacked on a `semi`-filled **body card** (sans, the bullets). The strip gives hierarchy without needing bold.
+- **Floating layout.** Cells are inset ~7px and sit on a soft `grey` board, so visible gutters make it read as a designed dashboard, not a tiled grid.
+- **Decoration.** A full-width serif **title band** (`LEAN CANVAS · <name> · (#NNNN)`), an **amber accent rule** beneath it, and a **color-key legend** of chips along the bottom that documents the palette.
+- **Readable sizes.** The canvas is ~1560px wide, where tldraw `size:"s"` text is unreadable — body/headers are `m`, the title is `l`. Keep bullets short (Step 3 already enforces this) so `m` text fits the 286px columns.
+
+The fixed grid the script lays out (tldraw px, ~1500×900 before the title band):
 
 | Cell | x | y | w | h |
 | ---- | -- | -- | -- | -- |
@@ -92,30 +155,23 @@ The Lean Canvas grid is 5 columns wide on top with two of the columns split hori
 | Revenue Streams | 750 | 600 | 750 | 300 |
 | Early Adopters | 1200 | 600 | 300 | 300 |
 
-> Maurya's original Lean Canvas tucks "Early Adopters" inside Customer Segments as a sub-list. Splitting it into its own bottom-right cell makes empty-vs-filled obvious at a glance, which is the point of the canvas for our flow. Keep this layout unless the user asks for the classic.
-
-For each cell, draw two things:
-1. A `geo` rectangle at the position+size above, no fill, thin border.
-2. A `text` shape inside it — header on line 1 (bold or larger), then 2–4 bullets. Add ~16px of inner padding so text doesn't kiss the border.
-
-Add a title above the grid: `Lean Canvas — <idea name> (#NNNN)` at roughly `(0, -60)`.
+> Maurya's original tucks "Early Adopters" inside Customer Segments. Splitting it into its own bottom-right cell makes empty-vs-filled obvious at a glance — the point of the canvas for our flow. Keep this layout unless the user asks for the classic.
 
 ## Step 6 — Render and save
 
-Call `create_tldraw_diagram` on the `tldraw` MCP with:
-
-- `shapes`: the JSON array you built (as a string).
-- `outputPath`: an **absolute** path like `<project-root>/docs/#NNNN-<slug>-canvas.png`. Make sure `docs/` exists; create it if not.
-- `format`: `"png"` by default. Offer `"svg"` if the user asks for vector.
-
-Then also write the same shapes JSON to `docs/#NNNN-<slug>-canvas.tldr.json` so the user can re-render or edit later. (The MCP takes shapes JSON directly, so this JSON file *is* the editable source.)
+1. Run the build script (Step 5), pointing its `<out.tldr.json>` at `docs/#NNNN-<slug>-canvas.tldr.json` (create `docs/` if missing). That file *is* the editable source — the MCP takes shapes JSON directly, so the user can re-render or tweak it later.
+2. Pass the JSON the script printed to `create_tldraw_diagram`:
+   - `shapes`: the compact JSON string from stdout.
+   - `outputPath`: an **absolute** path like `<project-root>/docs/#NNNN-<slug>-canvas.png`.
+   - `format`: `"png"` by default — it embeds cleanly in slides and the pitch summary. Also offer/render `"svg"` when the canvas is text-dense or headed for print: vector text stays crisp at any zoom.
 
 ## Step 7 — Report
 
 Tell the user three things:
 
 1. Where the PNG landed (`docs/#NNNN-<slug>-canvas.png`).
-2. Which cells were thin or empty, and which source file would fill them (e.g., "Channels is empty — run `marketing-plan` for #0001").
+2. Which cells were thin or empty (the red ones), and which source file would fill them (e.g., "Channels is empty — run `marketing-plan` for #0001").
 3. The single weakest cell — usually Unfair Advantage or Key Metrics for early-stage ideas — and the cheapest experiment to strengthen it.
+4. A one-liner offering the alternatives: the calmer `mono` theme, or an `svg` for print/slides — re-render on request.
 
 If a file with the same name already exists in `docs/`, append a numeric suffix (`-canvas-v2.png`, `-v3`, etc.) — canvases evolve and old versions are useful to keep for diffing.

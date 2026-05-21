@@ -152,7 +152,7 @@ The fixed grid the script lays out (tldraw px, ~1500×900 before the title band)
 | Channels | 900 | 300 | 300 | 300 |
 | Customer Segments | 1200 | 0 | 300 | 600 |
 | Cost Structure | 0 | 600 | 750 | 300 |
-| Revenue Streams | 750 | 600 | 750 | 300 |
+| Revenue Streams | 750 | 600 | 450 | 300 |
 | Early Adopters | 1200 | 600 | 300 | 300 |
 
 > Maurya's original tucks "Early Adopters" inside Customer Segments. Splitting it into its own bottom-right cell makes empty-vs-filled obvious at a glance — the point of the canvas for our flow. Keep this layout unless the user asks for the classic.

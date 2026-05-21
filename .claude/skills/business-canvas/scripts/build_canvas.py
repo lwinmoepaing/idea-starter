@@ -46,7 +46,7 @@ LAYOUT = {
     "channels":  ("CHANNELS",           "how",   900,  300, 300, 300),
     "segments":  ("CUSTOMER SEGMENTS",  "who",   1200, 0,   300, 600),
     "cost":      ("COST STRUCTURE",     "money", 0,    600, 750, 300),
-    "revenue":   ("REVENUE STREAMS",    "money", 750,  600, 750, 300),
+    "revenue":   ("REVENUE STREAMS",    "money", 750,  600, 450, 300),
     "adopters":  ("EARLY ADOPTERS",     "who",   1200, 600, 300, 300),
 }
 

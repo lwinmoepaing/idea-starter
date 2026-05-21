@@ -1,0 +1,23 @@
+{
+  "skill_name": "pitch-deck",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "make a pitch deck for #0001",
+      "expected_output": "A landscape 16:9 PDF at docs/#0001-platekarma-deck.pdf with a title slide, Problem, Solution, Live Demo (steps), Impact, and a closing statement slide. Plain text (no markdown asterisks). Editable spec saved as docs/#0001-platekarma-deck.json.",
+      "files": ["fixtures/docs/#0001-platekarma-pitch.md"]
+    },
+    {
+      "id": 2,
+      "prompt": "turn the platekarma pitch into a presentation pdf",
+      "expected_output": "Same deck as eval 1, resolved by slug rather than id.",
+      "files": ["fixtures/docs/#0001-platekarma-pitch.md"]
+    },
+    {
+      "id": 3,
+      "prompt": "I need slides for the shiftledger demo day",
+      "expected_output": "A deck at docs/#0007-shiftledger-deck.pdf. Because the pitch has no Demo flow section, the deck should NOT contain an empty Live Demo slide — the agent should drop it (or fold the demo beats into Solution) and note the omission. 5–6 slides total.",
+      "files": ["fixtures/docs/#0007-shiftledger-pitch.md"]
+    }
+  ]
+}

@@ -22,3 +22,4 @@ Workers that skills delegate to. Invoke via the Agent tool with `subagent_type: 
 - `phase-writer` — renders one phase spec to markdown. Spawn N in parallel for N phases.
 - `phase-executor` — implements one phase: reads `plans/todo/{id}-{NN}-<slug>.md`, writes code to `mvp/`, returns done-when results. `mvp-execute` spawns N in parallel for parallel-safe groups.
 - `pitch-summary` — synthesizes workflow + root plan + shipped phases into `docs/#{id}-<slug>-pitch.md`. Auto-triggered when an ID's last phase ships.
+- `deck-builder` — distills one `docs/#{id}-<slug>-pitch.md` into a slide-deck PDF (`docs/#{id}-<slug>-deck.pdf` + editable `-deck.json`). Spawned by `pitch-deck`, one per drop.
